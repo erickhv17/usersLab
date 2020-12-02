@@ -24,11 +24,17 @@ http.createServer(app).listen(app.get("port"), function () {
 
 app.get("/student/getAll", function (request, response) {
   try {
-    if (students) response.status(200).json(students.students);
-    else
-      response
-        .status(500)
-        .send({ message: "Error, Something is wrong getting the students" });
+    if (students) {
+      let listForResponse = students.students.map((element) => {
+        let copy = { ...element };
+        delete copy.carrer;
+        delete copy.admissionDate;
+        delete copy.address;
+        delete copy.active;
+        return copy;
+      });
+      response.status(200).json(listForResponse);
+    } else response.status(500).send({ message: "Error, Something is wrong getting the students" });
   } catch (ex) {
     response
       .status(500)
@@ -59,12 +65,13 @@ app.get("/student/get/:id", function (request, response) {
 
 app.post("/student/add", function (req, response) {
   var postData = req.body;
+  postData.id = getRandomInt();
 
   try {
     let responseAdd = insertFunction(postData);
 
     !responseAdd
-      ? response.status(200).json({
+      ? response.status(201).json({
           message: "Success, An student has been added correctly!",
         })
       : response.status(400).json({
@@ -147,4 +154,8 @@ deleteFunction = (id) => {
   if (index > -1) students.students.splice(index, 1);
 
   return index;
+};
+
+getRandomInt = () => {
+  return Math.floor(Math.random() * Math.floor(999999999999));
 };
