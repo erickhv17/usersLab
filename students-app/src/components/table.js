@@ -29,7 +29,7 @@ class TableInicial extends Component {
   }
 
   handleSummit = () => {
-    const { idToDelete } = this.state;
+    const { idToDelete, students } = this.state;
     axios
       .post("http://localhost:3038/student/delete/" + idToDelete)
       .then((response) => {
@@ -38,6 +38,12 @@ class TableInicial extends Component {
           message: response.data.message,
           title: response.status === 200 ? "Success" : "Error",
           idToDelete: "",
+          students:
+            response.status === 200
+              ? students.filter((e) => {
+                  return e.id !== idToDelete;
+                })
+              : students,
         });
       });
   };
